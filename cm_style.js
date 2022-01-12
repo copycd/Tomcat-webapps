@@ -105,12 +105,6 @@
 			return;
 		}
 		
-		// 현존 건물.
-		if( edate == 0 )
-		{
-			edate = 30000101;
-		}
-		
 		var properties = tileset.properties;
 		if( false )
 		{
@@ -145,6 +139,26 @@
 						inSdate : sdate,
 						inEdate : edate
 					},					
+					show: {
+						conditions : [
+							// Any building that has this elementId will have `show = false`.
+							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) >= ${inEdate}", true],
+							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) <= 0", true],
+							[true, false]
+						]
+					}
+				});
+			}
+		}
+		else if( styleName == 'building_TimeSeries' )
+		{
+			//if (Cesium.defined(properties) && Cesium.defined(properties.modelheight))
+			{
+				tileset.style = new Cesium.Cesium3DTileStyle({
+					defines : {
+						inSdate : sdate,
+						inEdate : edate
+					},					
 					color: {
 						conditions: [
 							["Number(${SDate}) > 20000101", "color('white')"],
@@ -156,11 +170,12 @@
 					show: {
 						conditions : [
 							// Any building that has this elementId will have `show = false`.
-							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) <= ${inEdate}", true],
+							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) >= ${inEdate}", true],
+							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) <= 0", true],
 							[true, false]
 						]
 					}
 				});
 			}
-		}
+		}			
 	}	

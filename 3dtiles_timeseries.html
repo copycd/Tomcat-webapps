@@ -44,16 +44,15 @@
 	<div id="cesiumContainer" class="fullSize"></div>
 	<div id="loadingOverlay"><h1>Loading...</h1></div>
 	<div id="toolbar">
-      <div>Start Year</div>
+      <div>Year</div>
       <input
         type="range"
         min="1970"
-        max="2020"
+        max="2021"
         step="1"
-        data-bind="value: startYear, valueUpdate: 'input'"
+        data-bind="value: endYear, valueUpdate: 'input'"
       />
-      <input type="text" size="5" data-bind="value: startYear" />
-
+      <input type="text" size="5" data-bind="value: endYear" />
 	</div>
 
     <script src="https://code.jquery.com/jquery.js"></script>
@@ -194,8 +193,8 @@
 		var viewModel = {
 			tilesets: [
 				{
-					name: 'test',
-					resource: './SampleData/Cesium3DTiles/wgs84/test/test.json',
+					name: 'yeouido_timeseries_2201',
+					resource: './SampleData/Cesium3DTiles/wgs84/yeouido_timeseries_2201/test.json',
 					styleName: 'building_TimeSeries'
 				}
 			],
@@ -205,6 +204,13 @@
 		  
 		var annotations = scene.primitives.add(new Cesium.LabelCollection());
 
+        var viewModelStartYear = {
+          startYear: 1970,
+        };
+        var viewModelEndYear = {
+          endYear: 2000,
+        };
+		
 		// tileset을 로딩함.
 		var curr_tileset;
 		{
@@ -220,28 +226,23 @@
 				flyToTileset( cesiumViewer, tileset );
 
 				tileset.styleName = viewModel.tilesets[0].styleName;
-				tile3d_setStyle_showhide_timeSeries1(tileset, tileset.styleName, 0, 0 );
+				tile3d_setStyle_showhide_timeSeries1(tileset, tileset.styleName, viewModelStartYear.startYear*10000, viewModelEndYear.endYear*10000 );
 			});
 		}
 
-
-        var viewModelStartYear = {
-          startYear: 1970,
-        };
-
-        Cesium.knockout.track(viewModelStartYear);
+        Cesium.knockout.track(viewModelEndYear);
 		
 		var toolbar = document.getElementById('toolbar');
-		Cesium.knockout.applyBindings(viewModelStartYear, toolbar);
+		Cesium.knockout.applyBindings(viewModelEndYear, toolbar);
         Cesium.knockout
-          .getObservable(viewModelStartYear, "startYear")
-          .subscribe(function (startYear) {
-            startYear = Number(startYear);
-            if (isNaN(startYear)) {
+          .getObservable(viewModelEndYear, "endYear")
+          .subscribe(function (endYear) {
+            endYear = Number(endYear);
+            if (isNaN(endYear)) {
               return;
             }
 
-			tile3d_setStyle_showhide_timeSeries1(curr_tileset, curr_tileset.styleName, startYear*10000, 0 );
+			tile3d_setStyle_showhide_timeSeries1(curr_tileset, curr_tileset.styleName, viewModelStartYear.startYear*10000, endYear*10000 );
 			
           });
 
