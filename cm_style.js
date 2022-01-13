@@ -143,7 +143,7 @@
 						conditions : [
 							// Any building that has this elementId will have `show = false`.
 							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) >= ${inEdate}", true],
-							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) <= 0", true],
+							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) === 0", true],
 							[true, false]
 						]
 					}
@@ -171,7 +171,7 @@
 						conditions : [
 							// Any building that has this elementId will have `show = false`.
 							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) >= ${inEdate}", true],
-							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) <= 0", true],
+							["Number(${SDate}) >= ${inSdate} && Number(${EDate}) === 0", true],
 							[true, false]
 						]
 					}
