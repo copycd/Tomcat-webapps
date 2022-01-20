@@ -1032,8 +1032,19 @@ function I3SLayer(sceneServer, layerData, index) {
   if (this._dataSource._query && this._dataSource._query !== "") {
     query = "?" + this._dataSource._query;
   }
-  this._completeUriWithoutQuery =
-    sceneServer._dataSource._url + "/" + this._uri;
+
+	// [copycd]  
+  if( this._uri.startsWith("./") )
+  {
+	  this._completeUriWithoutQuery =
+		sceneServer._dataSource._url + "/" + this._uri.slice(2);
+  }
+  else
+  {
+	  this._completeUriWithoutQuery =
+		sceneServer._dataSource._url + "/" + this._uri;
+  }
+
   this._completeUri = this._completeUriWithoutQuery + query;
 
   this._data = layerData;
@@ -1425,7 +1436,8 @@ I3SLayer.prototype._loadNodePage = function (page) {
         resolve();
       });
     } else {
-      var query = "";
+	// copycd::
+      var query = "/index.json";
       if (that._dataSource._query && that._dataSource._query !== "") {
         query = "?" + that._dataSource._query;
       }
@@ -1792,8 +1804,12 @@ I3SNode.prototype.load = function (isRoot) {
         that._uri = "../" + uriIndex;
       }
       if (that._uri !== undefined) {
-        that._completeUriWithoutQuery =
-          that._parent._completeUriWithoutQuery + "/" + that._uri;
+		// copycd::
+        let original = that._parent._completeUriWithoutQuery + "/" + that._uri;
+		  
+		let aa = new URL( that._uri, "http://www.test.com/" + that._parent._completeUriWithoutQuery + "/" );
+		that._completeUriWithoutQuery = '.' + aa.pathname; 
+		  
         var query = "";
         if (that._dataSource._query && that._dataSource._query !== "") {
           query = "?" + that._dataSource._query;
@@ -1904,6 +1920,10 @@ I3SNode.prototype._loadGeometryData = function () {
     );
 
     var geometryURI = "./geometries/" + geometryDefinition.bufferIndex;
+	// copycd::
+	if( geometryDefinition.bufferIndex === undefined )
+		geometryURI = "./geometries/" + geometryDefinition + "/index.bin";
+	
     var newGeometryData = new I3SGeometry(this, geometryURI);
     newGeometryData._geometryDefinitions = geometryDefinition.definition;
     newGeometryData._geometryBufferInfo = geometryDefinition.geometryBufferInfo;
@@ -3073,6 +3093,12 @@ Cesium3DTile.prototype.requestContent = function () {
       key = key.slice(5);
     }
 
+	// copycd:: 임의로 처리함.
+    if (key.startsWith("///")) {
+      key = key.replace('///','./');
+    }
+	
+	
     var content = _i3sContentCache[key];
     if (!content) {
       console.error("invalid key", key, _i3sContentCache);
