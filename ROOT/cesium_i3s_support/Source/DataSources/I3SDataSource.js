@@ -556,6 +556,9 @@ I3SDataSource.prototype._setLoading = function (isLoading) {
  */
 I3SDataSource.prototype._loadJson = function (uri, success, fail) {
   var that = this;
+  
+  // [copycd] 버그인것 같은 uri는 폴더이름임.
+  uri += "/index.json";
   return new _Promise(function (resolve, reject) {
     if (that._traceFetches) {
       console.log("I3S FETCH:", uri);
@@ -4426,7 +4429,8 @@ I3SGLTFProcessingQueue.prototype._process = function () {
 I3SGLTFProcessingQueue.prototype._createWorkers = function (cb) {
   var workerCode = String(_workerCode);
 
-  var externalModules = ["/Source/ThirdParty/Workers/draco_decoder.js"];
+  // [copycd] html기준인것 같음.
+  var externalModules = ["../Source/ThirdParty/Workers/draco_decoder.js"];
 
   var fetchPromises = [];
   var externalModuleData = [];

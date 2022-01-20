@@ -27,8 +27,22 @@
   </head>
   <body>
     <div id="cesiumContainer"></div>
-    <script>
+    <script type="module">
       var viewer = new Cesium.Viewer("cesiumContainer");
+	  
+	  import I3SDataSource from '../Source/DataSources/I3SDataSource.js';
+	  
+		let dataSource = new I3SDataSource( "", viewer.scene, {
+			traceFetches : false, // for tracing I3S fetches
+			traceVisuals : false, // for tracing visuals
+			autoCenterCameraOnStart : true, // auto center to the location of the i3s
+			//geoidTiledTerrainProvider : geoidService,  // pass the geoid service
+		} );
+		
+		dataSource.loadUrl('./SampleData/I3S/SceneServer');
+		//dataSource.dataSources.add(dataSource);
+		
+		viewer.dataSources.add(dataSource);
     </script>
   </body>
 </html>
