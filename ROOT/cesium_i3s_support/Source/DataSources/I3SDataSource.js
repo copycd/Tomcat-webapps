@@ -556,9 +556,6 @@ I3SDataSource.prototype._setLoading = function (isLoading) {
  */
 I3SDataSource.prototype._loadJson = function (uri, success, fail) {
   var that = this;
-  
-  // [copycd] 버그인것 같은 uri는 폴더이름임.
-  uri += "/index.json";
   return new _Promise(function (resolve, reject) {
     if (that._traceFetches) {
       console.log("I3S FETCH:", uri);
@@ -1032,19 +1029,8 @@ function I3SLayer(sceneServer, layerData, index) {
   if (this._dataSource._query && this._dataSource._query !== "") {
     query = "?" + this._dataSource._query;
   }
-
-	// [copycd]  
-  if( this._uri.startsWith("./") )
-  {
-	  this._completeUriWithoutQuery =
-		sceneServer._dataSource._url + "/" + this._uri.slice(2);
-  }
-  else
-  {
-	  this._completeUriWithoutQuery =
-		sceneServer._dataSource._url + "/" + this._uri;
-  }
-
+  this._completeUriWithoutQuery =
+    sceneServer._dataSource._url + "/" + this._uri;
   this._completeUri = this._completeUriWithoutQuery + query;
 
   this._data = layerData;
@@ -1272,7 +1258,7 @@ I3SLayer.prototype.load = function () {
         that._loadNodePage(0).then(function () {
           that._loadRootNode().then(function () {
             that._create3DTileSet();
-            if (that._data.store.version === "1.6") {
+            if (that._data.store.version === "1.7") {
               that._rootNode._loadChildren().then(function () {
                 resolve();
               });
@@ -1436,8 +1422,7 @@ I3SLayer.prototype._loadNodePage = function (page) {
         resolve();
       });
     } else {
-	// copycd::
-      var query = "/index.json";
+      var query = "";
       if (that._dataSource._query && that._dataSource._query !== "") {
         query = "?" + that._dataSource._query;
       }
@@ -1804,12 +1789,8 @@ I3SNode.prototype.load = function (isRoot) {
         that._uri = "../" + uriIndex;
       }
       if (that._uri !== undefined) {
-		// copycd::
-        let original = that._parent._completeUriWithoutQuery + "/" + that._uri;
-		  
-		let aa = new URL( that._uri, "http://www.test.com/" + that._parent._completeUriWithoutQuery + "/" );
-		that._completeUriWithoutQuery = '.' + aa.pathname; 
-		  
+        that._completeUriWithoutQuery =
+          that._parent._completeUriWithoutQuery + "/" + that._uri;
         var query = "";
         if (that._dataSource._query && that._dataSource._query !== "") {
           query = "?" + that._dataSource._query;
@@ -1871,7 +1852,11 @@ I3SNode.prototype._loadChildren = function (waitAllChildren) {
           childIsLoaded.then(
             (function (theChild) {
               return function () {
-                that._tile.children.push(theChild._tile);
+				  // copycd:: null일때 죽음.
+				  if( that._tile !== null )
+				  {
+					that._tile.children.push(theChild._tile);
+				  }
               };
             })(newChild)
           );
@@ -1920,10 +1905,6 @@ I3SNode.prototype._loadGeometryData = function () {
     );
 
     var geometryURI = "./geometries/" + geometryDefinition.bufferIndex;
-	// copycd::
-	if( geometryDefinition.bufferIndex === undefined )
-		geometryURI = "./geometries/" + geometryDefinition + "/index.bin";
-	
     var newGeometryData = new I3SGeometry(this, geometryURI);
     newGeometryData._geometryDefinitions = geometryDefinition.definition;
     newGeometryData._geometryBufferInfo = geometryDefinition.geometryBufferInfo;
@@ -3093,12 +3074,6 @@ Cesium3DTile.prototype.requestContent = function () {
       key = key.slice(5);
     }
 
-	// copycd:: 임의로 처리함.
-    if (key.startsWith("///")) {
-      key = key.replace('///','./');
-    }
-	
-	
     var content = _i3sContentCache[key];
     if (!content) {
       console.error("invalid key", key, _i3sContentCache);
@@ -4455,7 +4430,7 @@ I3SGLTFProcessingQueue.prototype._process = function () {
 I3SGLTFProcessingQueue.prototype._createWorkers = function (cb) {
   var workerCode = String(_workerCode);
 
-  // [copycd] html기준인것 같음.
+  // copycd:: html기준인것 같음. 경로를 맞춰줌.
   var externalModules = ["../Source/ThirdParty/Workers/draco_decoder.js"];
 
   var fetchPromises = [];
