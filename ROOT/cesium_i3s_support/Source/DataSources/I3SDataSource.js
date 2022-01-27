@@ -1258,7 +1258,7 @@ I3SLayer.prototype.load = function () {
         that._loadNodePage(0).then(function () {
           that._loadRootNode().then(function () {
             that._create3DTileSet();
-            if (that._data.store.version === "1.7") {
+            if (that._data.store.version === "1.6") {
               that._rootNode._loadChildren().then(function () {
                 resolve();
               });
