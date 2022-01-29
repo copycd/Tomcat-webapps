@@ -37,7 +37,7 @@
   
 	  import I3SDataSource from '../Source/DataSources/I3SDataSource.js';
 	  
-		var testI3S = 1;
+		var testI3S = 0;
 		if( testI3S === 0 )
 		{
 			let dataSource = new I3SDataSource( "My Test", viewer.scene, {
@@ -50,8 +50,9 @@
 			// copycd::카메라를 해줘야함.
 			dataSource.camera = viewer.camera;
 			//dataSource.loadUrl('./SampleData/I3S/SceneServer');
-			dataSource.loadUrl('http://localhost:8080/cesium_i3s_support/Apps/SampleData/I3S/SceneServer').then(function () {});
-			//dataSource.loadUrl('http://localhost:8080/cesium_i3s_support/Apps/SampleData/I3S/BatchedTextured');
+			//dataSource.loadUrl('http://localhost:5055/svc/i3s/Rancho_Mesh_v17/SceneServer').then(function () {});
+			dataSource.loadUrl('http://localhost:5055/svc/i3s/yd/SceneServer').then(function () {});
+			//dataSource.loadUrl('http://localhost:5055/svc/i3s/BatchedTextured').then(function () {});
 			viewer.dataSources.add(dataSource);
 		}
 		else if( testI3S === 1 )
