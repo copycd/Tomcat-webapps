@@ -28,18 +28,26 @@
   <body>
     <div id="cesiumContainer"></div>
     <script type="module">
-		var viewer = new Cesium.Viewer("cesiumContainer", {
-		  terrainProvider: new Cesium.createWorldTerrain({}),
-		  animation: false,
-		  timeline: false,
-		});
-
+	
+		var testI3S_ArcGIS = false;
   
 	  import I3SDataSource from '../Source/DataSources/I3SDataSource.js';
 	  
-		var testI3S = 0;
-		if( testI3S === 0 )
+		if( testI3S_ArcGIS === false )
 		{
+			var viewer = new Cesium.Viewer("cesiumContainer", {
+			// copycd::지형없이.
+			  //terrainProvider: new Cesium.createWorldTerrain({}),
+			  animation: false,
+			  timeline: false,
+			});
+			
+			// 아래 데모는 지형을 설정해줘야 보임.
+			var i3sDataUrl = 'http://localhost:5055/svc/i3s/Rancho_Mesh_v17/SceneServer';
+			// 아래 데모는 지형을 제거해야 보임.
+			i3sDataUrl = 'http://localhost:5055/svc/i3s/yd/SceneServer';
+			//i3sDataUrl = 'http://localhost:5055/svc/i3s/BatchedTextured';
+		
 			let dataSource = new I3SDataSource( "My Test", viewer.scene, {
 				traceFetches : false, // for tracing I3S fetches
 				traceVisuals : false, // for tracing visuals
@@ -49,14 +57,21 @@
 			
 			// copycd::카메라를 해줘야함.
 			dataSource.camera = viewer.camera;
-			//dataSource.loadUrl('./SampleData/I3S/SceneServer');
-			//dataSource.loadUrl('http://localhost:5055/svc/i3s/Rancho_Mesh_v17/SceneServer').then(function () {});
-			dataSource.loadUrl('http://localhost:5055/svc/i3s/yd/SceneServer').then(function () {});
-			//dataSource.loadUrl('http://localhost:5055/svc/i3s/BatchedTextured').then(function () {});
+			dataSource.loadUrl(i3sDataUrl).then(function () {});
+			
 			viewer.dataSources.add(dataSource);
 		}
-		else if( testI3S === 1 )
+		else if( testI3S_ArcGIS === true )
 		{
+			var viewer = new Cesium.Viewer("cesiumContainer", {
+			  terrainProvider: new Cesium.createWorldTerrain({}),
+			  animation: false,
+			  timeline: false,
+			});
+			
+			var i3sDataUrl = 'https://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/Rancho_Mesh_v17/SceneServer';
+			//i3sDataUrl = 'https://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/NYC_Attributed_v17/SceneServer';
+			
 			// Initialize a terrain provider which provides geoid conversion between orthometric (I3S) and ellipsoidial
 			// height systems (cesium world terrain).
 			// source Data was compiled from https://earth-info.nga.mil/#tab_wgs84-data
@@ -77,10 +92,7 @@
 			
 			dataSource.camera = viewer.camera;
 			dataSource
-			  .loadUrl(
-				//"https://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/NYC_Attributed_v17/SceneServer"
-				"https://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/Rancho_Mesh_v17/SceneServer"
-			  )
+			  .loadUrl(i3sDataUrl)
 			  .then(function () {});
 			viewer.dataSources.add(dataSource);
 		}
