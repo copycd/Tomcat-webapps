@@ -1788,9 +1788,25 @@ I3SNode.prototype.load = function (isRoot) {
           ].mesh.geometry.resource;
         that._uri = "../" + uriIndex;
       }
+	  // copycd:: mesh가 없는 node도 있음.
+	  else{
+        that._uri = "../" + node.index;
+		// copycd:: 주소를 정제해야 함.
+		// 여기서 이미 완성해 버렸는데, 밑에서 어떻게 처리하지?
+		let newAA = new URL( that._uri, that._parent._completeUriWithoutQuery );
+		that._completeUriWithoutQuery = newAA.href; 
+		// 아래에서 처리하지 않도록 하기 위해서 완성형으로 처리.
+		that._uri = "it is completed.";
+	  }
+	  
       if (that._uri !== undefined) {
-        that._completeUriWithoutQuery =
-          that._parent._completeUriWithoutQuery + "/" + that._uri;
+		  // copycd:: null인경우는 이미 완성된 경우라고 생각하고 처리하지 말자.
+		 if( that._uri !== "it is completed." )
+		 {
+			that._completeUriWithoutQuery =
+			  that._parent._completeUriWithoutQuery + "/" + that._uri;
+		 }
+		  
         var query = "";
         if (that._dataSource._query && that._dataSource._query !== "") {
           query = "?" + that._dataSource._query;
@@ -1904,6 +1920,11 @@ I3SNode.prototype._loadGeometryData = function () {
       ["position", "uv0"]
     );
 
+	// copycd:: 왜 못찾는 경우가 발생하지?
+	// 일단 아래에서 에러가 나는것을 피하기 위해서.
+	if( geometryDefinition === 0 )
+		return null;
+	
     var geometryURI = "./geometries/" + geometryDefinition.bufferIndex;
     var newGeometryData = new I3SGeometry(this, geometryURI);
     newGeometryData._geometryDefinitions = geometryDefinition.definition;
