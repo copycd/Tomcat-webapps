@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <!-- Use Chrome Frame in IE -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="Use the 3D Tiles inspector as a debugging tool for different tilesets."
+    />
+    <meta name="cesium-sandcastle-labels" content="3D Tiles" />
+    <title>Cesium Demo</title>
+    <script type="text/javascript" src="./Sandcastle/Sandcastle-header.js"></script>
+    <script
+      type="text/javascript"
+      src="../Build/CesiumUnminified/Cesium.js"
+      nomodule
+    ></script>
+    <script type="module" src="./Sandcastle/load-cesium-es6.js"></script>
+	
+  </head>
+	<body
+	class="sandcastle-loading"
+	data-sandcastle-bucket="bucket-requirejs.html"
+	>
+	<style>
+		@import url(./Sandcastle/templates/bucket.css);
+      #toolbar .cesium-button {
+        display: block;
+      }
+	</style>
+	<div id="cesiumContainer" class="fullSize"></div>
+	<div id="loadingOverlay"><h1>Loading...</h1></div>
+	<div id="toolbar">
+		<select data-bind="options: tilesets, optionsText: 'name', value: selectedTileset, optionsCaption: 'Choose a Tileset...'"></select>
+	</div>
+
+    <script src="https://code.jquery.com/jquery.js"></script>
+	<script type="text/javascript" src="./cm_style.js"></script>
+	<script type="text/javascript" src="./cm_test.js"></script>
+	<script type="text/javascript" src="./cm_terrain.js"></script>
+	<script type="text/javascript" src="./cm_tilesetslist.js"></script>
+
+	
+	<script id="cesium_sandcastle_script">
+
+	var cesiumViewer;
+
+	function myTestFunc( viewer, ellipsoid )
+	{
+		// 오차확인할때 사용함.
+		//myGeometryTest01(viewer, ellipsoid);
+		//myModelTest_glb(viewer);
+	}
+
+
+	function flyToTileset( viewer, tileset )
+	{
+		if( false )
+		{
+			viewer.flyTo(tileset);
+		}
+		else
+		{
+			 viewer.zoomTo(
+				tileset,
+				new Cesium.HeadingPitchRange(
+				  0.0,
+				  -0.5,
+				  tileset.boundingSphere.radius / 2.0
+				)
+			  );
+		}
+	}
+
+
+	function startup(Cesium) {
+		'use strict';
+		//Sandcastle_Begin
+
+		// Enable experimental features for 3DTILES_multiple_contents support
+		Cesium.ExperimentalFeatures.enableModelExperimental = true;
+
+		//----------------------------------------------------------------------------
+		// 변수 설정들
+		// sesium ion에 접속하기 위한 개인 key.
+		Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkMjRlMjlhZC1kOGQxLTQ4YjktOGY1Mi03MjgwNDk3MjY0ZjQiLCJpZCI6NDU5LCJpYXQiOjE1MjUyNDY3ODF9.ysZ8Aa5FHHe_6GSm8EFFVIsMFpjHXW1sJ9TVlwWG8Lc';
+		var vwEllipsoid = new Cesium.Ellipsoid( 6378137, 6378137, 6378137 );
+		var vwGlobe = new Cesium.Globe(vwEllipsoid);
+		var vwMapProjection = new Cesium.GeographicProjection(vwEllipsoid);
+		var cesiumEllipsoid = Cesium.Ellipsoid.WGS84;
+		var cesiumGlobe = new Cesium.Globe(cesiumEllipsoid);
+		var cesiumMapProjection = new Cesium.GeographicProjection(cesiumEllipsoid);
+
+		var targetEllipsoid = cesiumEllipsoid;
+		var targetGlobe = cesiumGlobe;
+		var targetMapProjection = cesiumMapProjection;
+
+		// Ellipsoid를 적용하려면 이렇게 해줘야 된다고 함. 
+		Cesium.Ellipsoid.WGS84 = targetEllipsoid;
+
+
+		//----------------------------------------------------------------------------
+		// Image Provider 설정.
+		var baseImageProvider = null;
+		{
+			if( false )
+			{
+				//var id = 2;
+				var id = 28782;
+				// 이건, cesium ion에 원하는 영상을 올려놓고 서비스를 받아서 사용함.
+				baseImageProvider = new Cesium.IonImageryProvider({ assetId: id,
+				// Your imagery provider needs the ellipsoid.  Specify it here.
+				ellipsoid: targetEllipsoid });
+			}
+			else
+			{
+				// label이 중첩되어서 지져분하긴하지만, 무료로 제공하는 것중에서 대한민국을 가장 잘 나타내는것 같음.
+				baseImageProvider = new Cesium.BingMapsImageryProvider({
+					url : 'https://dev.virtualearth.net',
+					ellipsoid: targetEllipsoid,
+					// 사이트에서 자신의 키를 발급받아야 함.
+					key : 'AmGEvcpUSbfoynPKjdD32iwHMjqmmYN24OimDOxd48m9_SUz8rZwSEtNKIhdNJN7',
+					mapStyle : Cesium.BingMapsStyle.AERIAL_WITH_LABELS_ON_DEMAND
+				});
+			}
+			
+			if( baseImageProvider == null )
+			{
+			}
+		}
+
+
+		//----------------------------------------------------------------------------
+		// terrain Provider 설정.
+		var myTerrainProvider = null;
+		{
+			myTerrainProvider = getTerrainProvider_Seoul();
+			if( myTerrainProvider == null )
+				myTerrainProvider = getTerrainProvider_World();
+		}
+
+		//----------------------------------------------------------------------------
+		// Viewer 설정.
+		cesiumViewer = new Cesium.Viewer('cesiumContainer', {
+			shadows : false,
+			timeline : false,
+			infoBox : true,
+			animation : false,
+			selectionIndicator : false,
+			navigationHelpButton : false,
+			mapProjection : targetMapProjection,
+			ellipsoid : targetEllipsoid,
+			globe:targetGlobe
+		});
+
+		// cesium 용
+		var imageryLayer = cesiumViewer.imageryLayers.addImageryProvider( baseImageProvider );
+		cesiumViewer.terrainProvider = myTerrainProvider;
+		cesiumViewer.scene.globe.depthTestAgainstTerrain = true;
+		cesiumViewer.extend(Cesium.viewerCesium3DTilesInspectorMixin);
+        cesiumViewer.extend(Cesium.viewerCesiumInspectorMixin);
+		cesiumViewer.clock.currentTime = new Cesium.JulianDate(2457522.154792);
+
+		// inspector
+		var inspectorViewModel = cesiumViewer.cesium3DTilesInspector.viewModel;
+		if( inspectorViewModel != null )
+		{
+			// true로하면 속도가 느리므로, 기본값으로 false.
+			inspectorViewModel.picking = false;
+		}
+
+		var scene = cesiumViewer.scene;
+		var current_lon, current_lat, current_alt;
+
+		myTestFunc(cesiumViewer, targetEllipsoid);
+
+		//----------------------------------------------------------------------------
+		// Menu 및 사용자 UI 관련 설정.
+		var viewModel = {
+			tilesets: getTilesetsList(),
+			selectedTileset: undefined,
+			shadows: true
+		};
+		Cesium.knockout.track(viewModel);
+
+		var toolbar = document.getElementById('toolbar');
+		Cesium.knockout.applyBindings(viewModel, toolbar);
+
+		var annotations = scene.primitives.add(new Cesium.LabelCollection());
+		// OsmBuilding이 높이값이 안맞는것 같음.
+		//cesiumViewer.scene.primitives.add(Cesium.createOsmBuildings());
+
+
+		var curr_tileset;
+		Cesium.knockout.getObservable(viewModel, 'selectedTileset').subscribe(function(options) {
+			if (Cesium.defined(curr_tileset)) {
+				scene.primitives.remove(curr_tileset);
+			}
+			if (!Cesium.defined(options)) {
+				inspectorViewModel.tileset = undefined;
+				return;
+			}
+			
+			var new_tileset = new Cesium.Cesium3DTileset({
+				url : options.resource,
+				modelMatrix : options.modelMatrix ? options.modelMatrix:undefined,
+			});
+			
+			curr_tileset = cesiumViewer.scene.primitives.add(new_tileset);
+
+			curr_tileset.readyPromise.then( (tileset)=>{
+				inspectorViewModel.tileset = tileset;
+				
+				flyToTileset( cesiumViewer, tileset );
+
+				tileset.styleName = options.styleName;
+				if( tileset._url == "./SampleData/Cesium3DTiles/wgs84/시계열/test.json" )
+				{
+					tile3d_setStyle_showhide_timeSeries1(tileset, options.styleName, 9900120, 0 );
+				}
+				else
+				{
+					tile3d_setStyle_colorByMaterial(tileset, options.styleName );
+				}
+				
+			}).otherwise(function(error) {
+				throw(error);
+			});
+		});
+
+
+		var handler = new Cesium.ScreenSpaceEventHandler(cesiumViewer.canvas);
+
+		handler.setInputAction(function(movement) {
+			var feature = inspectorViewModel.feature;
+			if (Cesium.defined(feature)) {
+				var propertyNames = feature.getPropertyNames();
+				var length = propertyNames.length;
+				for (var i = 0; i < length; ++i) {
+					var propertyName = propertyNames[i];
+					console.log(propertyName + ': ' + feature.getProperty(propertyName));
+				}
+			}
+		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+		handler.setInputAction( function(movement) {
+			var feature = inspectorViewModel.feature;
+			if (Cesium.defined(feature)) {
+				feature.show = false;
+			}
+		}, Cesium.ScreenSpaceEventType.MIDDLE_CLICK);
+
+		Sandcastle.addToggleButton("Shadows", cesiumViewer.shadows, function (
+		  checked
+		) {
+		  cesiumViewer.shadows = checked;
+		});
+		
+		Sandcastle.addToolbarMenu([
+		{
+		  text: "Terrain",
+		},
+		{
+		  text: "Seoul",
+		  onselect: function () {
+			cesiumViewer.terrainProvider = getTerrainProvider_Seoul();
+		  },
+		},
+		{
+		  text: "World",
+		  onselect: function () {
+			cesiumViewer.terrainProvider = getTerrainProvider_World();
+		  },
+		},
+		{
+		  text: "Seoul-Cityholl",
+		  onselect: function () {
+			cesiumViewer.terrainProvider = getTerrainProvider_SeoulCityholl();
+		  },
+		},
+		{
+		  text: "None",
+		  onselect: function () {
+			cesiumViewer.terrainProvider = getTerrainProvider_None();
+		  },
+		}
+		]);
+		
+		Sandcastle.addToolbarMenu([
+		{
+		  text: "Style",
+		},
+		{
+		  text: "None",
+		  onselect: function () {
+			tile3d_setStyle_None(curr_tileset);
+		  },
+		},
+		{
+		  text: "By Height",
+		  onselect: function () {
+			tile3d_setStyle_colorByMaterial(curr_tileset, curr_tileset.styleName );
+		  },
+		},
+		{
+		  text: "By Distance",
+		  onselect: function () {
+			colorFeaturesWithConditions(curr_tileset, current_lon, current_lat);
+		  },
+		}
+		]);		
+		
+		//Sandcastle_End
+		Sandcastle.finishedLoading();
+		
+		var handler = new Cesium.ScreenSpaceEventHandler(cesiumViewer.scene.canvas);
+		handler.setInputAction(function (event) {
+			// Screen coordinates to world coordinates key points
+			var ray=cesiumViewer.camera.getPickRay(event.position);
+			var cartesian=cesiumViewer.scene.globe.pick(ray,cesiumViewer.scene);
+			//Converting Cartesian coordinates to geographic coordinates
+			var cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+			//Decimal representation of radians to degrees
+			var lon = Cesium.Math.toDegrees(cartographic.longitude);
+			var lat = Cesium.Math.toDegrees(cartographic.latitude);
+			// Get altitude
+			var height1 = cesiumViewer.scene.globe.getHeight(cartographic);
+			var height2 = cartographic.height;
+			
+			current_lon = lon;
+			current_lat = lat;
+			current_alt = height1;
+
+			var myCoord = { lon : lon, lat : lat, height1: height1 };
+			console.log(myCoord);
+		}, Cesium.ScreenSpaceEventType.LEFT_CLICK);		
+	};
+
+	if (typeof Cesium !== "undefined") {
+		window.startupCalled = true;
+		startup(Cesium);
+	};
+	
+
+	window.onload = function(){
+		hideInspectorBar();
+	};
+	
+	
+	function hideInspectorBar()
+	{
+		let elem1 = document.getElementsByClassName("cesium-3DTilesInspector");
+		elem1[0].classList.replace('cesium-cesiumInspector-visible', 'cesium-cesiumInspector-hidden');
+		
+		let elem2 = document.getElementsByClassName("cesium-cesiumInspector");
+		// 2번째에 걸림.
+		elem2[0].classList.replace('cesium-cesiumInspector-visible', 'cesium-cesiumInspector-hidden');
+		elem2[1].classList.replace('cesium-cesiumInspector-visible', 'cesium-cesiumInspector-hidden');
+	}	
+
+	</script>
+	
+</body>
+</html>
