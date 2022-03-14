@@ -1,7 +1,8 @@
 // This file loads the unbuilt ES6 version of Cesium
 // into the global scope during local developmnet
 
-window.CESIUM_BASE_URL = "../../../Source/";
+// copycd:: 이건 실행되는 app 기준의 상대경로임.
+window.CESIUM_BASE_URL = "../Source/";
 
 import * as Cesium from "../../Source/Cesium.js";
 window.Cesium = Cesium;
