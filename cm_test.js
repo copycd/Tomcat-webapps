@@ -133,7 +133,7 @@ function myModelTest_glb( viewer )
 	var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame( position );
 	var gltfmodel = Cesium.Model.fromGltf(
 	{
-		url : './SampleData/models/test/vworld/B_0_44_36.glb',
+		url : './SampleData/models/test/fordtransit.glb',
 		show : true,                     // default
 		modelMatrix : modelMatrix,
 		scale : 1,
@@ -142,21 +142,6 @@ function myModelTest_glb( viewer )
 	});
 	var model = viewer.scene.primitives.add(gltfmodel);
 	viewer.scene.primitives.add(model);
-	
-	
-	position = Cesium.Cartesian3.fromDegrees( 126.946826605187, 37.52695615674003, 500 );
-	modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame( position );
-	gltfmodel = Cesium.Model.fromGltf(
-	{
-		url : './SampleData/models/test/vworld/aaaa.gltf',
-		show : true,                     // default
-		modelMatrix : modelMatrix,
-		scale : 1,
-		name: "name_test2",
-		debugShowBoundingVolume : true // default
-	});
-	model = viewer.scene.primitives.add(gltfmodel);
-	viewer.scene.primitives.add(model);	
 }
 
 
