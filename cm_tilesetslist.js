@@ -102,10 +102,13 @@ function getTilesetsList()
 			name: '광화문일대_0726_drc_basisu',
 			resource: './SampleData/Cesium3DTiles/wgs84/광화문일대_0726_drc_basisu/test.json'
 		}, {
-			name: 'high_여산휴게소',
+			name: '여산휴계소_2022_b_d',
+			resource: './SampleData/Cesium3DTiles/wgs84/여산휴계소_2022_b_d/test.json'
+		}, {
+			name: '여산휴게소_2021',
 			resource: './SampleData/Cesium3DTiles/wgs84/여산휴게소/test.json'
 		}, {
-			name: 'high_여산휴게소_b_d',
+			name: '여산휴게소_2021_b_d',
 			resource: './SampleData/Cesium3DTiles/wgs84/여산휴게소_b_d/test.json'
 		}, {
 			name: 'test_i3dm',
