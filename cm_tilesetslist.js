@@ -111,6 +111,9 @@ function getTilesetsList()
 			name: '여산휴게소_2021_b_d',
 			resource: './SampleData/Cesium3DTiles/wgs84/여산휴게소_b_d/test.json'
 		}, {
+			name: '종로거리일부_Pnts',
+			resource: './SampleData/Cesium3DTiles/wgs84/pnts_종로거리일부/tileset.json'
+		}, {
 			name: 'test_i3dm',
 			resource: './SampleData/Cesium3DTiles/wgs84/i3dm/i3dm.json'
 		}, {

@@ -133,7 +133,7 @@ function myModelTest_glb( viewer )
 	var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame( position );
 	var gltfmodel = Cesium.Model.fromGltf(
 	{
-		url : './SampleData/models/test/fordtransit.glb',
+		url : './SampleData/models/test/AB01_AF01.glb',
 		show : true,                     // default
 		modelMatrix : modelMatrix,
 		scale : 1,
