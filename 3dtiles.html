@@ -283,9 +283,15 @@
 		  },
 		},
 		{
-		  text: "None",
+		  text: "ArcGISWorld",
 		  onselect: function () {
-			cesiumViewer.terrainProvider = getTerrainProvider_None();
+			cesiumViewer.terrainProvider = getTerrainProvider_ArcGISTiledElevationTerrain();
+		  },
+		},
+		{
+		  text: "Ellipsoid",
+		  onselect: function () {
+			cesiumViewer.terrainProvider = getTerrainProvider_Ellipsoid();
 		  },
 		}
 		]);

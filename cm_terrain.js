@@ -33,7 +33,7 @@ function getTerrainProvider_World()
 	return terrainProvider;
 }
 
-function getTerrainProvider_None()
+function getTerrainProvider_Ellipsoid()
 {
 	return new Cesium.EllipsoidTerrainProvider();
 }
@@ -42,7 +42,8 @@ function getTerrainProvider_None()
 function getTerrainProvider_VRTheWorldTerrain()
 {
 	const terrainProvider = new Cesium.VRTheWorldTerrainProvider({
-	  url : 'https://www.vr-theworld.com/vr-theworld/tiles1.0.0/73/'
+	  url: "http://www.vr-theworld.com/vr-theworld/tiles1.0.0/73/",
+	  credit: "Terrain data courtesy VT MÄK",
 	});
 	
 	return terrainProvider;
@@ -62,7 +63,7 @@ function getTerrainProvider_GoogleEarthEnterpriseTerrain()
 
 
 // 이것도 권한이 있어야함.
-function getTerrainProvider_CesiumTerrain()
+function getTerrainProvider_CesiumIonTerrain()
 {
     const terrainProvider = new Cesium.CesiumTerrainProvider({
         url : Cesium.IonResource.fromAssetId(3956),
@@ -72,12 +73,12 @@ function getTerrainProvider_CesiumTerrain()
 	return terrainProvider;
 }
 
-// token이 있어야함.
-function getTerrainProvider_ArcGISTiledElevation()
+
+function getTerrainProvider_ArcGISTiledElevationTerrain()
 {
 	const terrainProvider = new Cesium.ArcGISTiledElevationTerrainProvider({
-	  url : 'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer',
-	  token : 'KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg..'
+	  url:
+		"https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer",
 	});
 	
 	return terrainProvider;
